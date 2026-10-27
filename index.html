@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>正缘探测 · 宿命缘分推演</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%230b0908'/%3E%3Ccircle cx='32' cy='32' r='22' fill='none' stroke='%23d8bc86' stroke-width='2'/%3E%3Ccircle cx='32' cy='32' r='8' fill='%23d8bc86'/%3E%3Ccircle cx='32' cy='32' r='3' fill='%230b0908'/%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#0b0908;
+  --bg2:#140d0a;
+  --panel:#4A151A;
+  --panel-soft:rgba(74,21,26,.55);
+  --ink:#E6D5B8;
+  --ink-dim:rgba(230,213,184,.66);
+  --ink-faint:rgba(230,213,184,.34);
+  --gold:#D8BC86;
+  --gold-hi:#Efdcb0;
+  --gold-deep:#A9853F;
+  --line:rgba(230,213,184,.16);
+  --line-soft:rgba(230,213,184,.08);
+  --red:#A63C3C;
+  --red-ink:#C96A5A;
+  --serif-title:"KaiTi","STKaiti","Kaiti SC","FangSong","STFangsong","SimSun",serif;
+  --serif-body:"Songti SC","STSong","Noto Serif SC","SimSun",serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--serif-body);
+  line-height:1.9;
+  -webkit-font-smoothing:antialiased;
+  letter-spacing:.02em;
+  overflow-x:hidden;
+}
+/* 背景氛围层 */
+#ambience{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+#ambience .veil{position:absolute;inset:0;
+  background:
+    radial-gradient(120% 90% at 50% -10%, rgba(165,133,63,.14), transparent 55%),
+    radial-gradient(90% 70% at 85% 110%, rgba(74,21,26,.35), transparent 60%);
+}
+#ambience .grain{position:absolute;inset:0;opacity:.5;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.06'/%3E%3C/svg%3E");
+}
+#ambience .halo{position:absolute;left:50%;top:6%;width:340px;height:340px;transform:translateX(-50%);
+  border:1px solid var(--line-soft);border-radius:50%;opacity:.5}
+#ambience .halo::after{content:"";position:absolute;inset:14px;border:1px solid var(--line-soft);border-radius:50%}
+#ambience .halo::before{content:"";position:absolute;inset:-18px;border:1px dashed var(--line-soft);border-radius:50%}
+
+.wrap{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column}
+
+.view{display:none;min-height:100vh;padding:34px 22px 44px;width:100%;max-width:620px;margin:0 auto;
+  flex-direction:column}
+.view.active{display:flex;animation:fadeIn .55s ease both}
+@keyframes fadeIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+/* ---------- 通用小部件 ---------- */
+.eyebrow{font-size:12px;letter-spacing:.42em;color:var(--ink-faint);text-align:center;margin-bottom:26px}
+.eyebrow.gold{color:var(--gold);opacity:.8}
+.orn{height:1px;background:linear-gradient(90deg,transparent,var(--gold-deep) 30%,var(--gold-deep) 70%,transparent);width:min(300px,76%);margin:0 auto;position:relative}
+.orn::after{content:"✦";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);color:var(--gold-deep);font-size:12px;background:var(--bg);padding:0 12px}
+.cta{display:block;width:100%;border:1px solid rgba(216,188,134,.5);background:linear-gradient(180deg,rgba(216,188,134,.14),rgba(216,188,134,.05));
+  color:var(--gold-hi);font-family:var(--serif-title);font-size:17px;letter-spacing:.28em;padding:15px 10px;
+  cursor:pointer;transition:.3s;position:relative}
+.cta:hover,.cta:active{background:linear-gradient(180deg,rgba(216,188,134,.26),rgba(216,188,134,.1));border-color:var(--gold)}
+.cta .arrow{display:block;font-size:11px;letter-spacing:.2em;color:var(--ink-faint);margin-top:6px}
+
+/* ---------- 启封页 ---------- */
+#view-seal{align-items:center;justify-content:center;text-align:center}
+.seal-emblem{width:74px;height:74px;border-radius:50%;border:1px solid var(--gold-deep);display:flex;align-items:center;justify-content:center;
+  position:relative;margin-bottom:34px;animation:breath 4.6s ease-in-out infinite}
+.seal-emblem::after{content:"";position:absolute;inset:8px;border:1px dashed var(--gold-deep);border-radius:50%;opacity:.7}
+.seal-emblem .inner{font-family:var(--serif-title);font-size:26px;color:var(--gold-hi);line-height:1}
+@keyframes breath{0%,100%{box-shadow:0 0 0 0 rgba(216,188,134,.0)}50%{box-shadow:0 0 26px 4px rgba(216,188,134,.16)}}
+.title-main{font-family:var(--serif-title);font-size:clamp(30px,7.4vw,44px);line-height:1.45;color:var(--gold-hi);
+  text-shadow:0 0 30px rgba(216,188,134,.16);margin-bottom:22px}
+.title-main b{display:block;font-weight:400;color:var(--ink)}
+.title-sub{font-size:14px;color:var(--ink-dim);letter-spacing:.2em;margin-bottom:6px}
+.seal-stamp{display:inline-flex;flex-direction:column;align-items:center;margin-top:14px;margin-bottom:30px}
+.seal-stamp .box{font-family:var(--serif-title);font-size:15px;letter-spacing:.34em;color:#f2d9c4;padding:12px 20px 10px;
+  border:2px solid var(--red);border-radius:6px;background:rgba(166,60,60,.08)}
+.seal-stamp .box small{display:block;font-size:10px;letter-spacing:.3em;color:var(--red-ink);margin-top:4px;font-family:var(--serif-body)}
+.seal-hint{font-size:13px;color:var(--ink-dim);max-width:430px;margin:0 auto 30px;letter-spacing:.05em}
+.seal-note{margin-top:26px;font-size:11px;color:var(--ink-faint);letter-spacing:.3em}
+
+/* ---------- 基础信息页 ---------- */
+#view-basic{align-items:stretch}
+.field-title{font-family:var(--serif-title);font-size:18px;color:var(--ink);letter-spacing:.16em;margin-bottom:16px;text-align:center}
+.field-title em{font-style:normal;color:var(--gold-deep);font-size:13px;letter-spacing:.2em;margin-left:8px}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:30px}
+.opt{border:1px solid var(--line);background:rgba(230,213,184,.02);padding:15px 12px;text-align:center;font-size:15px;letter-spacing:.1em;
+  cursor:pointer;transition:.25s;color:var(--ink-dim)}
+.opt small{display:block;font-size:11px;color:var(--ink-faint);letter-spacing:.12em;margin-top:4px}
+.opt:hover{border-color:var(--gold-deep);color:var(--ink)}
+.opt.sel{border-color:var(--gold);color:var(--gold-hi);background:linear-gradient(180deg,rgba(216,188,134,.16),rgba(216,188,134,.06));
+  box-shadow:0 0 18px rgba(216,188,134,.1);position:relative}
+.basic-head{margin-bottom:34px}
+
+/* ---------- 问卷页 ---------- */
+#view-quiz{align-items:stretch}
+.quiz-top{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:10px}
+.quiz-dim{font-family:var(--serif-title);font-size:14px;letter-spacing:.3em;color:var(--gold)}
+.quiz-count{font-size:12px;color:var(--ink-faint);letter-spacing:.18em}
+.progress{height:2px;background:var(--line-soft);margin-bottom:38px;position:relative}
+.progress i{position:absolute;left:0;top:0;height:100%;background:linear-gradient(90deg,var(--gold-deep),var(--gold-hi));
+  transition:width .5s ease;box-shadow:0 0 10px rgba(216,188,134,.5)}
+.q-body{flex:1;display:flex;flex-direction:column}
+.q-text{font-family:var(--serif-title);font-size:clamp(20px,5vw,26px);line-height:1.6;color:var(--ink);margin-bottom:34px;
+  border-left:2px solid var(--gold-deep);padding-left:16px}
+.q-opts{display:flex;flex-direction:column;gap:12px;margin-top:auto}
+.q-opt{border:1px solid var(--line);background:rgba(230,213,184,.02);padding:16px 16px 14px;text-align:left;font-size:15px;
+  color:var(--ink-dim);cursor:pointer;transition:.25s;line-height:1.7}
+.q-opt small{display:block;margin-top:3px;font-size:11px;color:var(--ink-faint);letter-spacing:.08em}
+.q-opt:hover{border-color:var(--gold-deep);color:var(--ink)}
+.q-opt.sel{border-color:var(--gold);color:var(--gold-hi);background:linear-gradient(180deg,rgba(216,188,134,.18),rgba(216,188,134,.05));
+  box-shadow:0 0 16px rgba(216,188,134,.1)}
+.q-opt.sel::after{content:"✓";float:right;color:var(--gold-hi)}
+
+/* ---------- 加载层 ---------- */
+#loading{position:fixed;inset:0;z-index:50;background:radial-gradient(120% 100% at 50% 30%,#140d0a,#080605);
+  display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+#loading.active{display:flex;animation:fadeIn .4s ease}
+.load-ring{width:74px;height:74px;border-radius:50%;border:1px solid var(--line);
+  border-top-color:var(--gold);border-right-color:var(--gold-deep);animation:spin 1.3s linear infinite;margin-bottom:34px;position:relative}
+.load-ring::after{content:"";position:absolute;inset:12px;border:1px dashed var(--gold-deep);border-radius:50%;animation:spin 2.4s linear infinite reverse;opacity:.7}
+@keyframes spin{to{transform:rotate(360deg)}}
+.load-tag{font-family:var(--serif-title);font-size:20px;letter-spacing:.34em;color:var(--gold-hi);margin-bottom:16px}
+.load-sub{font-size:13px;color:var(--ink-dim);letter-spacing:.2em;min-height:24px;animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:.35}50%{opacity:1}}
+
+/* ---------- 结果页 ---------- */
+#view-result{align-items:stretch;padding-bottom:60px}
+.result-hero{text-align:center;margin-bottom:26px}
+.result-sig{font-size:13px;color:var(--gold);letter-spacing:.2em;margin-bottom:16px}
+.result-title{font-family:var(--serif-title);font-size:clamp(25px,6vw,36px);color:var(--gold-hi);line-height:1.5;margin-bottom:14px}
+.stars{font-size:22px;letter-spacing:.22em;color:var(--gold);margin-bottom:4px;text-shadow:0 0 16px rgba(216,188,134,.4)}
+.sig-desc{font-size:14px;color:var(--ink-dim);max-width:480px;margin:0 auto;letter-spacing:.04em}
+.result-hero .orn{margin-top:20px}
+
+.sec{margin:30px 0}
+.sec-head{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.sec-head .no{font-family:var(--serif-title);font-size:12px;color:var(--gold-deep);letter-spacing:.2em;border:1px solid var(--gold-deep);border-radius:50%;width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;flex:none}
+.sec-head h3{font-family:var(--serif-title);font-size:17px;color:var(--ink);letter-spacing:.18em;font-weight:400}
+.sec-head .en{font-size:11px;color:var(--ink-faint);letter-spacing:.3em;margin-left:auto}
+.sec-body{font-size:15px;color:var(--ink-dim);line-height:2.05}
+.sec-body p{margin-bottom:14px}
+.sec-body strong{color:var(--ink);font-weight:500}
+
+.golden-box{border:1px solid var(--gold-deep);background:linear-gradient(180deg,rgba(216,188,134,.08),rgba(74,21,26,.2));
+  padding:34px 26px;text-align:center;margin:26px 0;position:relative}
+.golden-box::before,.golden-box::after{content:"❝";position:absolute;font-size:40px;color:var(--gold-deep);opacity:.5;font-family:var(--serif-title)}
+.golden-box::before{top:-6px;left:12px}
+.golden-box::after{content:"❞";bottom:-16px;right:12px}
+.golden-box .tag{font-size:11px;letter-spacing:.4em;color:var(--gold);margin-bottom:16px}
+.golden-box .quote{font-family:var(--serif-title);font-size:clamp(19px,5vw,25px);color:var(--gold-hi);line-height:1.9}
+
+.trap-list{display:flex;flex-direction:column;gap:12px}
+.trap-item{display:flex;gap:12px;align-items:flex-start;border-left:2px solid var(--red);padding:4px 0 4px 16px;font-size:15px;color:var(--ink-dim);line-height:1.9}
+.trap-item b{color:var(--red-ink);font-weight:500;flex:none;font-family:var(--serif-title);letter-spacing:.1em}
+
+.dim-chips{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:26px 0}
+.dim-chip{border:1px solid var(--line);padding:14px 12px;text-align:center;background:rgba(230,213,184,.02)}
+.dim-chip .k{font-family:var(--serif-title);font-size:13px;color:var(--gold);letter-spacing:.28em;margin-bottom:8px}
+.dim-chip .v{font-size:12px;color:var(--ink-faint);line-height:1.7;letter-spacing:.05em}
+
+.result-foot{text-align:center;margin-top:26px;font-size:11px;color:var(--ink-faint);letter-spacing:.22em;line-height:2}
+.replay{display:block;width:100%;margin-top:18px;border:1px solid var(--line);background:transparent;color:var(--ink-dim);
+  font-family:var(--serif-title);font-size:15px;letter-spacing:.24em;padding:13px;cursor:pointer;transition:.3s}
+.replay:hover{color:var(--gold-hi);border-color:var(--gold-deep)}
+
+@media (min-width:768px){
+  .view{padding:48px 30px 56px}
+  .q-opts{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .q-opt{min-height:88px}
+}
+</style>
+</head>
+<body>
+<div id="ambience" aria-hidden="true"><div class="veil"></div><div class="grain"></div><div class="halo"></div></div>
+
+<div class="wrap">
+
+<!-- ===== 视图：启封页 ===== -->
+<section class="view active" id="view-seal">
+  <div class="seal-emblem"><span class="inner">缘</span></div>
+  <div class="title-main">你的正缘<br><b>藏在哪一段宿命里</b></div>
+  <div class="title-sub">· 缘分推演 · 命局档案 · 缘数探测 ·</div>
+  <div class="seal-stamp">
+    <div class="box">正 缘 探 测<small>宿 命 缘 分 推 演</small></div>
+  </div>
+  <p class="seal-hint">请静心凝神，回想你出生时的季节与时辰，<br>开启你的缘分推演。</p>
+  <button class="cta" id="btn-unseal">启 封<span class="arrow">轻触此处 · 开启缘数</span></button>
+  <div class="seal-note">— 一 念 之 间 · 缘 数 自 明 —</div>
+</section>
+
+<!-- ===== 视图：基础信息 ===== -->
+<section class="view" id="view-basic">
+  <div class="basic-head">
+    <div class="eyebrow gold">先 定 三 缘</div>
+    <div class="orn"></div>
+  </div>
+  <div class="field-title">你的出生季节<em>· 定命局之气</em></div>
+  <div class="opts" data-group="season">
+    <div class="opt" data-val="spring">春<small>萌 发 之 气</small></div>
+    <div class="opt" data-val="summer">夏<small>炽 盛 之 气</small></div>
+    <div class="opt" data-val="autumn">秋<small>肃 敛 之 气</small></div>
+    <div class="opt" data-val="winter">冬<small>沉 藏 之 气</small></div>
+  </div>
+  <div class="field-title">你的大致出生时辰<em>· 定缘现之机</em></div>
+  <div class="opts" data-group="hour">
+    <div class="opt" data-val="midnight">子夜<small>至 暗 之 刻</small></div>
+    <div class="opt" data-val="dawn">清晨<small>天 光 初 现</small></div>
+    <div class="opt" data-val="noon">正午<small>日 中 之 旺</small></div>
+    <div class="opt" data-val="dusk">黄昏<small>暮 色 之 合</small></div>
+  </div>
+  <div class="field-title">你目前的感情状态<em>· 定缘数之态</em></div>
+  <div class="opts" data-group="status">
+    <div class="opt" data-val="single">单身<small>缘 在 远 方</small></div>
+    <div class="opt" data-val="ambiguous">暧昧<small>缘 正 萌 动</small></div>
+    <div class="opt" data-val="cut">断联<small>缘 待 重 续</small></div>
+  </div>
+  <button class="cta" id="btn-start">开 始 推 演<span class="arrow">三缘既定 · 命盘将启</span></button>
+</section>
+
+<!-- ===== 视图：问卷 ===== -->
+<section class="view" id="view-quiz">
+  <div class="quiz-top">
+    <span class="quiz-dim" id="q-dim"></span>
+    <span class="quiz-count" id="q-count"></span>
+  </div>
+  <div class="progress"><i id="q-progress"></i></div>
+  <div class="q-body">
+    <p class="q-text" id="q-text"></p>
+    <div class="q-opts" id="q-opts"></div>
+  </div>
+</section>
+
+<!-- ===== 视图：结果 ===== -->
+<section class="view" id="view-result"></section>
+
+</div>
+
+<!-- ===== 加载层 ===== -->
+<div id="loading">
+  <div class="load-ring"></div>
+  <div class="load-tag" id="load-tag">命盘解析中</div>
+  <div class="load-sub" id="load-sub"></div>
+</div>
+
+<script>
+/* ===== 题库数据 ===== */
+const QUESTIONS = [
+  /* 维度一 · 命局气质 */
+  {
+    name:"命局气质",
+    qs:[
+      {q:"面对突如其来的变故，你的第一直觉是？",opts:[
+        {t:"先稳住局面，顺应而行",k:"水 · 随顺",w:[1,1,0,0,0]},
+        {t:"迎上硬刚，直接解决",k:"金 · 锋芒",w:[0,2,0,0,0]},
+        {t:"抽离退后，暗中观望",k:"木 · 隐逸",w:[0,0,2,0,0]},
+        {t:"静心复盘，寻找破局之法",k:"火 · 洞见",w:[2,0,0,0,0]}
+      ]},
+      {q:"人群中的你，更习惯待在哪里？",opts:[
+        {t:"人群中心，自然被看见",k:"火 · 明",w:[0,0,0,2,1]},
+        {t:"安静角落，细细观察众人",k:"木 · 静",w:[0,0,2,0,0]},
+        {t:"游走其间，随缘交流",k:"水 · 流",w:[0,0,0,1,1]}
+      ]},
+      {q:"你人生的高光时刻，通常来自？",opts:[
+        {t:"被推上舞台，众目之下",k:"火 · 昭",w:[0,0,0,2,0]},
+        {t:"独自深耕，厚积薄发",k:"土 · 藏",w:[2,0,0,0,0]},
+        {t:"关键时刻，一击即中",k:"金 · 锐",w:[0,2,0,0,0]}
+      ]},
+      {q:"当有人向你倾诉情绪，你的本能是？",opts:[
+        {t:"共情承接，先陪着他",k:"水 · 润",w:[0,0,2,0,0]},
+        {t:"给出方案，解决问题",k:"金 · 析",w:[1,1,0,0,0]},
+        {t:"保持距离，不过度卷入",k:"木 · 守",w:[0,0,1,0,0]}
+      ]},
+      {q:"深夜独处时，你最容易？",opts:[
+        {t:"反复复盘过去",k:"水 · 溯",w:[0,0,2,0,0]},
+        {t:"规划未来的走向",k:"火 · 谋",w:[2,0,0,0,0]},
+        {t:"彻底放空，什么都不想",k:"木 · 空",w:[0,1,0,0,0]}
+      ]},
+      {q:"对「稳定而平淡」的生活，你的真实态度？",opts:[
+        {t:"向往，那是归宿",k:"土 · 安",w:[0,2,1,0,0]},
+        {t:"恐惧，那像枷锁",k:"金 · 烈",w:[0,0,0,2,0]},
+        {t:"接受，但渴望新鲜",k:"火 · 动",w:[1,0,0,0,1]}
+      ]},
+      {q:"你认定一件事后，更多依靠？",opts:[
+        {t:"直觉与感觉",k:"水 · 感",w:[0,0,1,1,0]},
+        {t:"逻辑与权衡",k:"金 · 理",w:[0,2,0,0,0]},
+        {t:"信念与坚持",k:"土 · 毅",w:[2,0,0,0,0]}
+      ]},
+      {q:"你的能量在什么状态下最旺？",opts:[
+        {t:"独自一人，专注做事",k:"土 · 聚",w:[2,0,0,0,0]},
+        {t:"人群之中，被需要时",k:"火 · 燃",w:[0,0,0,1,2]},
+        {t:"变动挑战，越难越强",k:"金 · 砺",w:[0,2,0,0,0]}
+      ]},
+      {q:"若为你的命格选一个关键词？",opts:[
+        {t:"守正",k:"土 · 守正",w:[0,2,0,0,0]},
+        {t:"灵动",k:"水 · 灵动",w:[0,0,2,0,0]},
+        {t:"锋芒",k:"金 · 锋芒",w:[0,0,0,2,0]},
+        {t:"清冷",k:"木 · 清冷",w:[1,0,1,0,0]}
+      ]}
+    ]
+  },
+  /* 维度二 · 桃花显化 */
+  {
+    name:"桃花显化",
+    qs:[
+      {q:"过去最刻骨铭心的关系，往往如何开始？",opts:[
+        {t:"一见倾心，电光火石",k:"火 · 灼",w:[0,0,0,2,1]},
+        {t:"日久生情，细水长流",k:"土 · 温",w:[0,0,2,0,0]},
+        {t:"权衡利弊，理性靠近",k:"金 · 衡",w:[1,1,0,0,0]},
+        {t:"意外交集，猝不及防",k:"水 · 缘",w:[0,0,1,0,1]}
+      ]},
+      {q:"你最容易在什么场合被人靠近？",opts:[
+        {t:"旅行与旅途",k:"水 · 驿",w:[0,0,0,1,1]},
+        {t:"工作与协作",k:"金 · 职",w:[2,1,0,0,0]},
+        {t:"朋友聚会与局",k:"火 · 宴",w:[0,0,0,1,2]},
+        {t:"网络与线上",k:"木 · 网",w:[0,0,2,0,0]}
+      ]},
+      {q:"你吸引来的前任，类型上更偏向？",opts:[
+        {t:"热烈主动，攻势很强",k:"火 · 焰",w:[0,0,0,2,0]},
+        {t:"若即若离，捉摸不定",k:"水 · 幻",w:[0,0,1,0,0]},
+        {t:"成熟强势，主导局面",k:"金 · 御",w:[1,2,0,0,0]},
+        {t:"温柔陪伴，默默付出",k:"土 · 柔",w:[0,0,2,0,0]}
+      ]},
+      {q:"恋爱初期，你最容易忽略的提醒是？",opts:[
+        {t:"对方未兑现的承诺",k:"金 · 疑",w:[1,1,0,0,0]},
+        {t:"情绪忽冷忽热的变化",k:"水 · 变",w:[0,0,2,0,0]},
+        {t:"越界的控制与占有",k:"火 · 侵",w:[0,0,0,1,0]},
+        {t:"关键细节的欺瞒",k:"木 · 隐",w:[0,2,0,0,0]}
+      ]},
+      {q:"烂桃花出现时，你的第一感受往往是？",opts:[
+        {t:"上瘾，明知不该",k:"火 · 瘾",w:[0,0,0,2,0]},
+        {t:"疲惫，被消耗",k:"土 · 耗",w:[1,0,1,0,0]},
+        {t:"虚荣，被追的满足",k:"金 · 傲",w:[0,0,0,1,1]},
+        {t:"不甘，想证明自己",k:"木 · 执",w:[0,1,1,0,0]}
+      ]},
+      {q:"进入一段关系前，你习惯？",opts:[
+        {t:"先付出，以诚换诚",k:"土 · 诚",w:[2,0,1,0,0]},
+        {t:"先试探，观察反应",k:"水 · 探",w:[0,0,2,0,0]},
+        {t:"顺其自然，不强求",k:"木 · 然",w:[0,1,0,0,1]}
+      ]},
+      {q:"过去感情的结束方式，更多偏向？",opts:[
+        {t:"突然断裂，戛然而止",k:"火 · 断",w:[0,0,0,1,0]},
+        {t:"缓慢耗尽，温水煮开",k:"水 · 竭",w:[0,0,2,0,0]},
+        {t:"反复拉扯，剪不断理还乱",k:"木 · 缠",w:[0,1,0,0,0]},
+        {t:"清醒离场，体面告别",k:"金 · 醒",w:[2,0,0,0,0]}
+      ]},
+      {q:"你内心深处对「桃花」的真正渴望是？",opts:[
+        {t:"被爱与被捧",k:"火 · 宠",w:[0,0,0,2,1]},
+        {t:"被理解与被懂",k:"水 · 知",w:[0,0,2,0,0]},
+        {t:"被坚定地选择",k:"金 · 择",w:[0,2,0,0,0]},
+        {t:"被看见与被欣赏",k:"火 · 见",w:[2,0,0,1,0]}
+      ]},
+      {q:"一段关系里最让你心动的瞬间？",opts:[
+        {t:"对方展现才华与能力",k:"金 · 才",w:[2,0,0,0,0]},
+        {t:"对方细心照顾你",k:"土 · 护",w:[0,0,2,0,0]},
+        {t:"对方尊重你的边界",k:"水 · 敬",w:[0,2,0,0,0]},
+        {t:"对方为你打破惯例",k:"火 · 破",w:[0,0,0,2,0]}
+      ]}
+    ]
+  },
+  /* 维度三 · 宿命卡点 */
+  {
+    name:"宿命卡点",
+    qs:[
+      {q:"关系即将进入实质承诺时，你最大的恐惧？",opts:[
+        {t:"失去自由与自我",k:"金 · 缚",w:[0,0,0,2,0]},
+        {t:"自己还不够好，会辜负",k:"木 · 卑",w:[1,0,1,0,0]},
+        {t:"对方并非真心，会辜负",k:"水 · 疑",w:[0,1,1,0,0]},
+        {t:"经营不好，再次失败",k:"火 · 怯",w:[1,1,0,0,0]}
+      ]},
+      {q:"你更常把「单身」归因于？",opts:[
+        {t:"还没遇到对的人",k:"火 · 待",w:[0,0,0,1,2]},
+        {t:"自己太挑、太苛刻",k:"金 · 苛",w:[1,0,0,0,0]},
+        {t:"缘分没到，强求不得",k:"水 · 缘",w:[0,1,2,0,0]},
+        {t:"不敢真正投入",k:"木 · 怯",w:[0,0,1,1,0]}
+      ]},
+      {q:"谈到「正缘」二字，你的下意识反应？",opts:[
+        {t:"半信半疑，怕被哄",k:"金 · 疑",w:[1,1,0,0,0]},
+        {t:"隐隐期待，暗暗相信",k:"火 · 盼",w:[0,0,0,1,2]},
+        {t:"下意识回避，不想谈",k:"木 · 避",w:[0,0,2,0,0]},
+        {t:"强烈渴望，又怕失望",k:"水 · 渴",w:[1,0,0,1,0]}
+      ]},
+      {q:"你在关系中的防御机制更偏向？",opts:[
+        {t:"察觉不对就抽身",k:"金 · 遁",w:[0,0,1,1,0]},
+        {t:"先索取，试探付出",k:"水 · 索",w:[0,0,0,0,1]},
+        {t:"先付出，受伤后撤离",k:"土 · 撤",w:[0,0,2,0,0]},
+        {t:"层层考验，不轻易信",k:"木 · 考",w:[0,2,0,0,0]}
+      ]},
+      {q:"阻碍你走向长期关系最大的内耗是？",opts:[
+        {t:"与他人比较，患得患失",k:"火 · 妒",w:[0,0,0,1,1]},
+        {t:"自我怀疑，配得感低",k:"木 · 卑",w:[1,0,1,0,0]},
+        {t:"过度讨好，失去自我",k:"土 · 谄",w:[0,1,1,0,0]},
+        {t:"逃避沟通，积压成结",k:"水 · 结",w:[2,0,0,0,0]}
+      ]},
+      {q:"面对「被爱」时，你的第一反应？",opts:[
+        {t:"我配吗？值得吗",k:"木 · 问",w:[1,0,1,0,0]},
+        {t:"警惕，别又是套路",k:"金 · 警",w:[0,2,0,0,0]},
+        {t:"安心，终于被接住",k:"土 · 安",w:[0,0,2,0,1]},
+        {t:"不习惯，想逃",k:"水 · 逃",w:[0,0,0,2,0]}
+      ]},
+      {q:"上一段关系遗留的最大心结是？",opts:[
+        {t:"不被坚定选择",k:"金 · 择",w:[0,2,0,1,0]},
+        {t:"付出不被看见",k:"土 · 隐",w:[0,0,2,0,0]},
+        {t:"信任崩塌，难以再信",k:"水 · 崩",w:[1,1,0,0,0]},
+        {t:"自我否定，归咎自己",k:"木 · 责",w:[1,0,1,0,0]}
+      ]},
+      {q:"你害怕被人看到真实的自己，因为？",opts:[
+        {t:"觉得自己不够好",k:"木 · 卑",w:[1,0,1,0,0]},
+        {t:"怕被伤害，收回真心",k:"水 · 伤",w:[0,0,2,0,0]},
+        {t:"怕被拿捏，失去主动",k:"金 · 控",w:[0,2,0,0,0]},
+        {t:"怕失去距离与神秘",k:"火 · 秘",w:[0,0,0,2,0]}
+      ]},
+      {q:"想到「走进婚姻」，你最先浮现的情绪？",opts:[
+        {t:"束缚与失去自由",k:"金 · 缚",w:[0,0,0,2,0]},
+        {t:"安稳与尘埃落定",k:"土 · 定",w:[0,2,1,0,0]},
+        {t:"茫然与不知未来",k:"水 · 茫",w:[1,0,1,0,0]},
+        {t:"向往与欢喜",k:"火 · 喜",w:[0,0,0,0,2]}
+      ]}
+    ]
+  },
+  /* 维度四 · 正缘雷达 */
+  {
+    name:"正缘雷达",
+    qs:[
+      {q:"人群中，什么细节让你产生「就是这个人」的直觉？",opts:[
+        {t:"那双眼睛，眼神交汇",k:"火 · 目",w:[0,0,0,2,1]},
+        {t:"那个声音，说话的方式",k:"水 · 声",w:[0,0,2,0,0]},
+        {t:"周身的气场，沉稳感",k:"土 · 场",w:[0,2,0,0,0]},
+        {t:"细小的习惯，落落大方",k:"木 · 微",w:[2,0,0,0,0]}
+      ]},
+      {q:"你相信正缘会以哪种方式出现？",opts:[
+        {t:"命中注定式的巧合",k:"火 · 定",w:[0,0,0,1,2]},
+        {t:"日常磨合，水到渠成",k:"土 · 磨",w:[0,1,2,0,0]},
+        {t:"猛然心动，猝不及防",k:"水 · 撞",w:[0,0,0,2,0]},
+        {t:"互相成就，并肩而行",k:"金 · 肩",w:[2,0,0,0,0]}
+      ]},
+      {q:"你会被什么样的「反差」打动？",opts:[
+        {t:"强大却温柔",k:"金 · 柔",w:[1,2,0,0,0]},
+        {t:"克制却深情",k:"土 · 深",w:[0,0,2,0,0]},
+        {t:"聪明却笨拙地爱你",k:"火 · 拙",w:[0,0,1,1,0]},
+        {t:"疏离却真诚",k:"水 · 真",w:[0,1,0,1,0]}
+      ]},
+      {q:"若正缘已在某个场景等你，你更希望是？",opts:[
+        {t:"带水的地方，海边河畔",k:"水 · 水",w:[0,0,2,0,0]},
+        {t:"工作交集，并肩做事",k:"金 · 职",w:[2,0,0,0,0]},
+        {t:"旅行途中，意外结缘",k:"火 · 旅",w:[0,0,0,1,1]},
+        {t:"熟悉的地方，久别重逢",k:"土 · 旧",w:[0,1,1,0,0]}
+      ]},
+      {q:"对「合适」与「心动」，你的态度？",opts:[
+        {t:"只要心动，其余可磨合",k:"火 · 心",w:[0,0,0,2,1]},
+        {t:"只要合适，安稳就好",k:"土 · 稳",w:[0,2,1,0,0]},
+        {t:"两个都要，缺一不可",k:"金 · 全",w:[2,0,0,0,0]},
+        {t:"看阶段，先心动后合适",k:"水 · 序",w:[0,0,1,1,0]}
+      ]},
+      {q:"判断一个人，你最看重？",opts:[
+        {t:"靠谱与担当",k:"土 · 靠",w:[1,2,0,0,0]},
+        {t:"有趣与鲜活",k:"火 · 趣",w:[0,0,0,2,1]},
+        {t:"有品与分寸",k:"金 · 品",w:[1,1,0,0,0]},
+        {t:"有温度、懂得爱",k:"水 · 温",w:[0,0,2,0,0]}
+      ]},
+      {q:"若正缘已在生活里，你最先的感知是？",opts:[
+        {t:"莫名地频繁想起他",k:"火 · 思",w:[0,0,0,2,0]},
+        {t:"反复的偶遇与巧合",k:"水 · 遇",w:[0,0,1,0,2]},
+        {t:"直觉与梦中的提示",k:"土 · 兆",w:[0,1,1,0,0]},
+        {t:"持续的好感与安心",k:"金 · 安",w:[2,1,0,0,0]}
+      ]},
+      {q:"你会被什么样的「稳定」吸引？",opts:[
+        {t:"情绪稳定，不内耗",k:"土 · 绪",w:[0,0,2,0,0]},
+        {t:"经济稳定，有底气",k:"金 · 财",w:[2,0,0,0,0]},
+        {t:"生活节奏稳定，规律",k:"木 · 律",w:[0,2,0,0,0]},
+        {t:"三观稳定，方向一致",k:"水 · 向",w:[1,1,0,0,0]}
+      ]},
+      {q:"你心中「正缘」最独特的标志是？",opts:[
+        {t:"久处不厌，细水长流",k:"土 · 久",w:[0,0,2,0,0]},
+        {t:"一眼万年，难以忘怀",k:"火 · 念",w:[0,0,0,2,0]},
+        {t:"彼此成就，越走越近",k:"金 · 成",w:[2,0,0,0,0]},
+        {t:"久别重逢，还是心动",k:"水 · 逢",w:[0,0,1,0,1]}
+      ]}
+    ]
+  }
+];
+/* ===== 剧本数据 ===== */
+const SCRIPTS = {
+  wealthCareer:{
+    title:"财官相连动",
+    stars:5,
+    sigDesc:"命主旺运引缘——当你的自我价值、事业与气场连动上扬时，正缘随之显化。",
+    portrait:"<p>你的正缘是<b>成熟通透、目标清晰</b>的人，气质偏清正持重，行事自带分寸与秩序，谈吐有内容却不炫耀。TA 身形挺拔、眼神沉稳，往往已在自己的领域站稳脚跟——或是管理层与专业型人才，或是独立创业者，或是那些自带实力与气场、让人一眼便觉“靠得住”的人。</p><p>TA 不是那种热烈炽烧的类型，而是<b>越相处越安心</b>的质地：给得出承诺，也接得住你的锋芒。与你相处时，TA 既欣赏你的能力，也懂得你卸下盔甲后的柔软，是能与你并肩、也能护你周全的命定之人。</p><p>你们的关系里，既有棋逢对手的欣赏，也有彼此托底的信任——TA 不会把你当附属，而会把你当作并肩的同行者。真正的财官相连，是你在 TA 面前无需证明自己，也依然被坚定认可。</p>",
+    meet:"<p>正缘最易出现在你<b>状态极佳、气场全开的阶段</b>——事业进阶、获得认可、自我确信最饱满的那一段天时。当你不再把重心放在“被选择”上，而是全神贯注于把日子过得漂亮时，缘分便会循着你散发的气场自然靠近。</p><p>相遇场景多带“进阶感”：<b>工作交集、行业活动、进修学习</b>，或因能力而来的意外契机。你们大概率从“并肩做事”开始——在一次你表现亮眼的场合，TA 注意到了你的从容，而你也在这份从容里，看见了 TA 的分量。</p><p>请留意那些“被你能力吸引”的目光——当你在某个场合因专业而闪光时，那个不夸夸其谈、只认真看你做事的人，往往就是命定的那一个。相遇的铺垫可能很早就开始，只等一个对的时间点破。</p>",
+    bond:"<p>TA 的出现会<b>打破你“习惯单打独斗”的旧状态</b>。你会开始为两个人规划，把“我的人生”慢慢改写成“我们的将来”；过去你引以为傲的独立，会被一种更柔软却也更踏实的牵挂取代。</p><p>你原本把重心押在“证明自己”上，而 TA 会让你发现：真正安稳的底气，不只是一个人的强大，而是有一个坚定的人，愿意把未来与你绑定。</p>",
+    golden:"你不需要找正缘，让自己变旺，正缘自然被你吸引。",
+    traps:["警惕以「欣赏你的能力」为名、实则想利用你资源的假桃花——那类总在关键时刻才出现、谈的都是「合作」而非「将来」的人。","当心因「被认可」而误把仰慕当心动——分辨清一个人是把你当伙伴，还是真的想把你放进他的人生。","别在低谷期仓促选择「能给你资源的安稳」——财官相连动的前提是你自己先旺，而非寄望于他人施予。","别在感情里也习惯性地「单打独斗」——正缘需要你愿意被接住，而不是永远逞强独撑。"]
+  },
+  officer:{
+    title:"大运见官",
+    stars:5,
+    sigDesc:"命主遇定盘之人——一个让你内心定下来、有秩序感的人，带着「命定担当」的分量出现。",
+    portrait:"<p>你的正缘是<b>清醒、坚定、有原则</b>的人，气质偏端正克制，说话做事都给你一种“靠得住”的安定感。TA 身形方正、眉目清朗，职业多为能担责任的方向——管理者、体系内或专业稳健型的人，或是人生阅历里自带分寸与担当、让你一见便安心的存在。</p><p>TA 不热衷于取悦，却会在你需要的时刻稳稳接住你。与你相处时，TA 给的不是一时热烈，而是一种<b>“无论发生什么，他都在”</b>的笃定——这正是你命局深处最渴望的秩序与底气。</p><p>TA 的喜欢不是口头承诺，而是落在一件件具体的事上——记得你的偏好、守时赴约、在你有难时第一个站出来的担当。与 TA 相处，你会慢慢放下“会不会被辜负”的防备，因为 TA 的言行始终一致。</p>",
+    meet:"<p>正缘最易出现在你<b>人生面临选择、需要“定”下来的阶段</b>——毕业、转岗、换城市，或某个让你重新审视未来的节点。那时你会格外渴望一个能带来方向与秩序的人，而 TA 恰在此时走进你的生活。</p><p>相遇场景常带“职责与担当”的气息：<b>工作分配、长辈牵线、团队协作</b>，或某个你不得不负责的场合。缘分不以浪漫开场，而始于一次“对方让你莫名安心”的共事。</p><p>若这段时间你正被某个“该担的责任”所牵动，请留意其中那个让你觉得“原来可以这样安心”的人。缘分不喧哗，却往往在日复一日的共事里，稳稳地立了起来。</p>",
+    bond:"<p>TA 的出现会<b>打破你“飘着”的状态</b>。你的生活会开始有更清晰的节奏，你会慢慢相信“稳定”不是束缚，而是底气；过去你回避的承诺与责任，会因为他让你安心，而变得不再可怕。</p><p>你原本以为自由高于一切，TA 却让你懂得：真正的自由，是有一个足够笃定的人，让你不必再患得患失。</p>",
+    golden:"遇见让你定下来的人，才明白漂泊的尽头，是安稳。",
+    traps:["警惕那些「看起来很可靠、实则控制欲强」的假桃花——他们用安全感包装越界，用「为你好」剥夺你的选择。","分清「对方给你秩序」与「对方替你决定人生」是两回事——真缘会让你安定，而非让你失去自主。","别把「怕改变」误当成「遇见了对的人」——真正的定盘，是你心甘情愿，而非将就妥协。","别把「对方很照顾我」误当成「对方尊重我」——真缘的照顾以你为先，而非以控制为名。"]
+  },
+  deepBond:{
+    title:"日支逢合",
+    stars:4,
+    sigDesc:"命主深缘暗合——你的正缘与你有「深层契约」，缘分早已藏在默契里，只待一个契机点燃。",
+    portrait:"<p>你的正缘是<b>温和、细腻、懂你</b>的人，气质偏内敛沉静，话不多，却句句落在你心上。TA 往往是你身边某个被忽略已久的人——老朋友、旧同事、重逢的故人，或是那些与你“三观合、眼神懂”的长期存在。</p><p>职业不限，但 TA 身上有种<b>“久处不厌”的质地</b>：不惊艳，却让你安心；不喧哗，却在你需要时从不缺席。你们之间的默契，往往不需要语言，一个眼神、一次沉默，就胜过千言万语。</p><p>TA 了解你的程度，往往超乎你的想象——不必解释，TA 就懂你的沉默、你的逞强、你藏在玩笑里的心事。你们之间没有用力过猛的热烈，却有旁人难以介入的契合。</p>",
+    meet:"<p>正缘最易出现在你的<b>“回望期”</b>——当你停下脚步回看过去，或生活节奏慢下来时，那个一直默默在的人会重新走进你的视线。缘分不以一见钟情开场，而以“原来是你”收束。</p><p>相遇场景常带“重逢”意味：<b>同学聚会、旧地重游、共同朋友牵线</b>，或某个你以为再也不会相见的场合。某一刻的沉默对望，让多年的铺垫终于有了答案。</p><p>重逢的那一刻，你们或许都沉默了一会儿——不是无话可说，而是千言万语不知从何讲起。多年铺垫在这一眼落了地，你才恍然：原来缘分从未走远，只等你回头。</p>",
+    bond:"<p>TA 的出现会<b>打破你“习惯独来独往”的孤独感</b>。你会第一次发现，被一个早已懂你的人接住，是怎样的踏实；过去你默认的“一个人也很好”，会在 TA 面前变得不再成立。</p><p>你原以为深缘只存在于想象，TA 却让你相信：真正的合，不是轰轰烈烈的开始，而是久别之后，你们仍选择了彼此。</p>",
+    golden:"正缘不一定惊艳开场，而是经年之后，你仍会选择的那个人。",
+    traps:["警惕因「熟悉」而误认的假桃花——那些相处舒适却从不推进、让你在一段温水里耗尽期待的旧缘，不是缘分，是拖延。","分清楚「舍不得过去」与「遇见了正缘」——对旧人的执念，往往会蒙蔽你看见眼前真正合适的人。","别因为「习惯」而将就——深缘的合，是心甘情愿的认定，而非熟悉的依赖。","警惕「重逢带来的滤镜」——多年不见的熟悉与心动，需要一次冷静相处来验证，而非凭当年的印象草率认定。"]
+  },
+  peachAttract:{
+    title:"桃花带合",
+    stars:4,
+    sigDesc:"命主光芒引缘——你天生带桃花磁场，正缘是循着你的光芒靠近的人。",
+    portrait:"<p>你的正缘是<b>果敢、主动、有审美</b>的人，气质偏鲜明出挑，眼神有光，敢于表达、敢于靠近。TA 往往被你的独特与气场吸引而来——或是在你发光发热的场合注意到你，或是在人群中第一个走向你。</p><p>职业偏创意、审美、表达向，身上有<b>“敢”与“真”</b>的特质。TA 给你的爱直接、热烈、不绕弯，从不吝啬表达欣赏，也从不掩饰心动——这正是桃花带合的独特磁场。</p><p>TA 的靠近不带试探，敢把心动放在明处；与你相处时，TA 会为你的每一次绽放真心喝彩，也敢在你需要时坦然地站在你这边。桃花带合，是 TA 用行动告诉你“你值得被爱”。</p>",
+    meet:"<p>正缘最易出现在你<b>“被看见”的阶段</b>——你的作品被认可、你的表达被关注，或你出现在聚光灯下时。桃花带合，是说你越绽放、缘分越近；当你不掩饰自己的光芒，那个该来的人就会被吸引而来。</p><p>相遇场景常带“审美与表达”的气息：<b>展览、演出、社交展示</b>，或你被聚焦的场合。TA 是主动的一方，可能在你们视线交错时，率先向你走来。</p><p>当你在某个场合被聚焦、被欣赏的那一刻，请留意那个眼神里没有一丝“看戏”、只有“欣赏”的人——TA 看你的方式，和旁人不一样。光所在之处，便是缘起之地。</p>",
+    bond:"<p>TA 的出现会<b>打破你“习惯隐藏锋芒”的谨慎</b>。你会开始坦然地发光、坦然地被爱；过去你为了不被看见而刻意低调，会因为一个真正欣赏你的人而彻底松绑。</p><p>你原本以为招摇会招来是非，TA 却让你懂得：真实的吸引力不该被压制，它只会替你筛选掉错误的人，留下对的人。</p>",
+    golden:"你的光不必藏，那个循光而来的人，就是你的正缘。",
+    traps:["警惕「为你的光芒而来、却接不住你真实样子」的假桃花——他们爱的是你发光的瞬间，不是你低落的时刻。","分辨「被欣赏」与「被接纳」——真缘会爱你的光，也懂你的暗；假缘只在你耀眼时靠近。","别把「主动靠近」当成「真心认定」——真正的桃花带合，是他欣赏你，也敢对这份欣赏负责。","警惕「为你的光而来、却又想熄灭你光」的人——真正的桃花带合，是让你越活越亮，而非让你收起锋芒去取悦。"]
+  },
+  joyStar:{
+    title:"红鸾天喜",
+    stars:4,
+    sigDesc:"命主喜星临门——天时已到，你的正缘会在一个「热闹的节点」被缘分推到眼前。",
+    portrait:"<p>你的正缘是<b>开朗、热络、人缘好</b>的人，气质偏明快温暖，笑容有感染力，谈吐大方，天生带着“聚人气”的磁场。TA 往往是朋友中的核心、聚会里的氛围担当，职业多与人打交道——传媒、餐饮、活动、社交型行业。</p><p>TA 的出现自带喜气，让你被热闹簇拥，也让你学会笑出声。与 TA 相处时，你会发现生活里那些值得庆祝的瞬间，都因他而变得更加明亮。</p><p>与 TA 在一起，你会发现“快乐”是很容易的事——TA 懂得把平凡日子过出喜气，也懂得在你低落时陪你安静。红鸾天喜带来的，不止是一段热闹的开场，更是持续很久的温暖。</p>",
+    meet:"<p>正缘最易出现在你的<b>“喜事期”</b>——朋友婚礼、红事、聚会、节日，或一个充满仪式感的场合。所谓“喜星引缘”，是当你的生活开始有喜气、有庆祝、有向好的气息时，正缘被这股热气推着来到你身边。</p><p>相遇场景常带“热闹”意味：<b>婚礼上邻座的交谈、朋友组的局、节日活动的意外结缘</b>。缘分来得明快，可能只是一次开怀大笑的对视，就奠定了后来。</p><p>若最近你正被邀进某个喜气盈盈的场合，请别再抱着“随便看看”的心态——那个在热闹里依然留意到你、愿意走到你身边的人，可能就是命运送来的喜讯。</p>",
+    bond:"<p>TA 的出现会<b>打破你“安静过日子”的惯性</b>。你会开始有更多邀约、更多欢笑、更多“值得庆祝”的理由；你原本的寡言与克制，会被一个热烈的人慢慢捂热。</p><p>你原以为缘分需要漫长的等待，TA 却让你明白：天时一到，喜气所至，那个对的人自会踩着热热闹闹的光，走到你面前。</p>",
+    golden:"缘分到了，藏都藏不住；喜气所至，正缘自来。",
+    traps:["警惕「热闹中来的快桃花」——在聚会、酒局、氛围上头时的心动，未必是真缘。","等热闹散去、清醒之后再确认那个人——避开那些只在你高兴时才出现的「气氛型桃花」。","别把「气氛的甜」当成「宿命的合」——红鸾天喜引来的缘，经得起安静时的相处，才算真正的喜。","警惕「只在喜事场合出现、平时却杳无音讯」的人——真缘的喜气，是融入日常的，而非只在热闹里现身。"]
+  }
+};
+/* ===== 基础信息 → 缘数初始权重 ===== */
+const BASE = {
+  season:{
+    spring:[0,0,0,2,2],
+    summer:[0,0,0,1,3],
+    autumn:[3,1,0,0,0],
+    winter:[0,2,2,0,0]
+  },
+  hour:{
+    midnight:[0,1,2,0,0],
+    dawn:[2,0,0,1,0],
+    noon:[0,0,0,1,2],
+    dusk:[1,2,0,0,0]
+  },
+  status:{
+    single:[0,0,0,2,1],
+    ambiguous:[0,0,1,0,2],
+    cut:[0,1,2,0,0]
+  }
+};
+
+const state={
+  basic:{season:"",hour:"",status:""},
+  answers:[],
+  qIndex:0,
+  scores:[0,0,0,0,0],
+  baseScores:[0,0,0,0,0],
+  busy:false
+};
+const SCRIPT_ORDER=["wealthCareer","officer","deepBond","peachAttract","joyStar"];
+const BLOCK_TAGS=["天 时 已 定","缘 数 叠 加 中","命 局 渐 明"];
+
+/* ---------- 视图切换 ---------- */
+function show(viewId){
+  document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
+  const el=document.getElementById(viewId);
+  el.classList.add("active");
+  window.scrollTo(0,0);
+}
+
+/* ---------- 加载层 ---------- */
+function showLoading(tag,subs,done){
+  const L=document.getElementById("loading");
+  document.getElementById("load-tag").textContent=tag;
+  const sub=document.getElementById("load-sub");
+  sub.textContent=subs[0];
+  let k=1;
+  const iv=setInterval(()=>{ if(L.classList.contains("active")){ sub.textContent=subs[k%subs.length]; k++; } },560);
+  L.classList.add("active");
+  setTimeout(()=>{
+    L.classList.remove("active");
+    clearInterval(iv);
+    done();
+  }, subs.length===0 ? 900 : (subs.length*560+400));
+}
+
+/* ---------- 基础信息选择 ---------- */
+document.querySelectorAll(".opts").forEach(group=>{
+  group.querySelectorAll(".opt").forEach(opt=>{
+    opt.addEventListener("click",()=>{
+      group.querySelectorAll(".opt").forEach(o=>o.classList.remove("sel"));
+      opt.classList.add("sel");
+    });
+  });
+});
+
+document.getElementById("btn-unseal").addEventListener("click",()=>{
+  showLoading("缘 门 初 启",["静心 · 凝神","一线天机，将启"],()=>show("view-basic"));
+});
+
+document.getElementById("btn-start").addEventListener("click",()=>{
+  const g={};
+  document.querySelectorAll(".opts").forEach(grp=>{
+    const sel=grp.querySelector(".opt.sel");
+    g[grp.dataset.group]=sel?sel.dataset.val:"";
+  });
+  if(!g.season||!g.hour||!g.status){
+    document.getElementById("btn-start").innerHTML="尚有缘数未定<span class='arrow'>请先选定三项 · 再启命盘</span>";
+    setTimeout(()=>{document.getElementById("btn-start").innerHTML="开 始 推 演<span class='arrow'>三缘既定 · 命盘将启</span>";},1800);
+    return;
+  }
+  state.basic=g;
+  state.scores=[0,0,0,0,0];
+  BASE.season[g.season].forEach((v,i)=>state.scores[i]+=v);
+  BASE.hour[g.hour].forEach((v,i)=>state.scores[i]+=v);
+  BASE.status[g.status].forEach((v,i)=>state.scores[i]+=v);
+  state.qIndex=0;
+  state.answers=[];
+  state.busy=false;
+  show("view-quiz");
+  renderQ(0);
+});
+
+/* ---------- 问卷渲染 ---------- */
+function flatIndex(dim,qn){return dim*9+qn;}
+function renderQ(i){
+  const dim=Math.floor(i/9), qn=i%9;
+  const D=QUESTIONS[dim], Q=D.qs[qn];
+  document.getElementById("q-dim").textContent=D.name;
+  document.getElementById("q-count").textContent=(i+1)+" / 36";
+  document.getElementById("q-progress").style.width=((i+1)/36*100)+"%";
+  document.getElementById("q-text").textContent=Q.q;
+  const box=document.getElementById("q-opts");
+  box.innerHTML="";
+  Q.opts.forEach((o,oi)=>{
+    const b=document.createElement("div");
+    b.className="q-opt";
+    b.innerHTML=(o.k?"<small>"+o.k+"</small>":"")+o.t;
+    b.addEventListener("click",()=>{
+      if(state.busy)return;
+      state.busy=true;
+      box.querySelectorAll(".q-opt").forEach(x=>x.classList.remove("sel"));
+      b.classList.add("sel");
+      state.answers.push(oi);
+      o.w.forEach((v,wi)=>{ state.scores[wi]+=v; });
+      const flat=i;
+      setTimeout(()=>{
+        if(flat===35){
+          showLoading("命 盘 合 参",["天时 · 地支 · 五行","缘数交融 · 命局将明","推演完成 · 立成档案"],finish);
+        }else if((flat+1)%9===0){
+          const bi=Math.floor((flat+1)/9)-1;
+          showLoading("命盘解析中",[BLOCK_TAGS[bi]||"缘数叠加中"],()=>{state.busy=false;renderQ(flat+1);});
+        }else{
+          state.busy=false;
+          renderQ(flat+1);
+        }
+      },330);
+    });
+    box.appendChild(b);
+  });
+}
+
+/* ---------- 结果生成 ---------- */
+function argmax(arr){let m=0;for(let i=1;i<arr.length;i++)if(arr[i]>arr[m])m=i;return m;}
+function finish(){
+  const idx=argmax(state.scores);
+  const sid=SCRIPT_ORDER[idx];
+  const S=SCRIPTS[sid];
+  /* 四象：每维度取被选最多的选项 */
+  const dimTags=[];
+  for(let d=0;d<4;d++){
+    const cnt={};let best=0,bestc=0;
+    for(let qn=0;qn<9;qn++){
+      const oi=state.answers[d*9+qn];
+      const tag=QUESTIONS[d].qs[qn].opts[oi].k;
+      cnt[tag]=(cnt[tag]||0)+1;
+      if(cnt[tag]>bestc){bestc=cnt[tag];best=tag;}
+    }
+    dimTags.push(best);
+  }
+  state.result={S,dimTags};
+  document.getElementById("view-result").innerHTML=resultHTML(S,dimTags);
+  show("view-result");
+}
+
+function stars(n){let s="";for(let i=0;i<n;i++)s+="★";return s;}
+
+function resultHTML(S,D){
+  return `
+  <div class="result-hero">
+    <div class="result-sig">正 缘 信 号</div>
+    <div class="result-title">${S.title}</div>
+    <div class="stars">${stars(S.stars)}</div>
+    <p class="sig-desc">${S.sigDesc}</p>
+    <div class="orn"></div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-head"><span class="no">壹</span><h3>正缘画像</h3><span class="en">PORTRAIT</span></div>
+    <div class="sec-body">${S.portrait}</div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-head"><span class="no">贰</span><h3>相遇节点与场景</h3><span class="en">MEETING</span></div>
+    <div class="sec-body">${S.meet}</div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-head"><span class="no">叁</span><h3>宿命牵绊</h3><span class="en">BOND</span></div>
+    <div class="sec-body">${S.bond}</div>
+  </div>
+
+  <div class="golden-box">
+    <div class="tag">宿 命 金 句</div>
+    <div class="quote">${S.golden}</div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-head"><span class="no">肆</span><h3>避坑指南 · 假桃花辨识</h3><span class="en">WARNING</span></div>
+    <div class="trap-list">${S.traps.map(t=>`<div class="trap-item"><b>忌</b><span>${t}</span></div>`).join("")}</div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-head"><span class="no">伍</span><h3>命局四象</h3><span class="en">FOUR PILLARS</span></div>
+    <div class="dim-chips">
+      ${QUESTIONS.map((Dd,di)=>`<div class="dim-chip"><div class="k">${Dd.name}</div><div class="v">${D[di]}</div></div>`).join("")}
+    </div>
+  </div>
+
+  <div class="result-foot">
+    — 此档案由你的三缘与36问推演而成 · 仅供缘分参考 —
+  </div>
+  <button class="replay" id="btn-replay">重 新 推 演</button>
+  `;
+}
+
+document.addEventListener("click",e=>{
+  if(e.target.closest && e.target.closest("#btn-replay")){
+    state.answers=[];state.scores=[0,0,0,0,0];state.qIndex=0;
+    show("view-seal");
+  }
+});
+</script>
+</body>
+</html>
